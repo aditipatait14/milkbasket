@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="row justify-content-center">
+				<div class="col-xl-8">
+					<div class="surface-panel p-4">
+						<h2 class="mb-3">Add Product</h2>
+
+						<th:block th:if="${session.succMsg}">
+							<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+							<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						</th:block>
+
+						<th:block th:if="${session.errorMsg}">
+							<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+							<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						</th:block>
+
+						<form action="/admin/saveProduct" method="post" enctype="multipart/form-data">
+							<div class="row g-3">
+								<div class="col-12">
+									<label class="form-label">Title</label>
+									<input type="text" name="title" class="form-control" required>
+								</div>
+								<div class="col-12">
+									<label class="form-label">Description</label>
+									<textarea rows="4" class="form-control" name="description" required></textarea>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Category</label>
+									<select class="form-select" name="category" required>
+										<option value="">--select--</option>
+										<option th:each="c:${categories}" th:value="${c.name}">[[${c.name}]]</option>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Price</label>
+									<input type="number" min="0" step="0.01" name="price" class="form-control" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Cost Price</label>
+									<input type="number" min="0" step="0.01" name="costPrice" class="form-control" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Discount %</label>
+									<input type="number" min="0" max="100" name="discount" value="0" class="form-control" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label d-block">Status</label>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" checked value="true" name="isActive" id="productActive">
+										<label class="form-check-label" for="productActive">Active</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="isActive" value="false" id="productInactive">
+										<label class="form-check-label" for="productInactive">Inactive</label>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Stock</label>
+									<input type="number" min="0" name="stock" class="form-control" required>
+								</div>
+								<div class="col-12">
+									<label class="form-label">Product Image</label>
+									<input type="file" name="file" class="form-control">
+								</div>
+								<div class="col-12">
+									<div class="alert alert-info mb-0">Discounted price is calculated automatically. Cost price is used in admin profit and loss analytics.</div>
+								</div>
+							</div>
+							<button class="btn btn-primary w-100 mt-4">Save Product</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

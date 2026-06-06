@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Customer Feedback</h2>
+						<p>Ratings are public, and this inbox helps admin review the full feedback stream.</p>
+					</div>
+					<a href="/admin/analytics" class="btn btn-outline-brand">View Analytics</a>
+				</div>
+
+				<div class="table-responsive" th:if="${feedbacks != null and !#lists.isEmpty(feedbacks)}">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Customer</th>
+								<th>Product</th>
+								<th>Rating</th>
+								<th>Feedback</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="feedback : ${feedbacks}">
+								<td>[[${feedback.updatedAt != null ? #temporals.format(feedback.updatedAt, 'dd MMM yyyy, hh:mm a') : ''}]]</td>
+								<td>
+									<div class="fw-semibold">[[${feedback.user.name}]]</div>
+									<div class="small text-secondary">[[${feedback.user.email}]]</div>
+								</td>
+								<td>
+									<div class="fw-semibold">[[${feedback.product.title}]]</div>
+									<div class="small text-secondary">[[${feedback.product.category}]]</div>
+								</td>
+								<td>
+									<div class="rating-stars mb-1">
+										<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 1} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 2} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 3} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 4} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 5} ? 'filled' : ''"></i>
+									</div>
+									<div class="small text-secondary">[[${feedback.rating}]] / 5</div>
+								</td>
+								<td class="text-secondary">[[${feedback.comment}]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="text-center py-5" th:unless="${feedbacks != null and !#lists.isEmpty(feedbacks)}">
+					<h4 class="mb-2">No feedback submitted yet</h4>
+					<p class="text-secondary mb-0">Customer comments and ratings will appear here once submitted.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

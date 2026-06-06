@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4 mb-4">
+				<div class="row align-items-center g-3">
+					<div class="col-lg-7">
+						<h1 class="mb-2">Dairy Marketplace</h1>
+						<p class="mb-0 text-secondary">Search products, filter by category and manage stock-aware shopping with a smoother storefront experience.</p>
+					</div>
+					<div class="col-lg-5">
+						<form action="/products" method="get">
+							<div class="input-group">
+								<input type="text" class="form-control" name="ch"
+									placeholder="Search milk, paneer, butter..." th:value="${searchValue}">
+								<input type="hidden" name="category" th:value="${paramValue}">
+								<button class="btn btn-primary px-4">
+									<i class="fa-solid fa-magnifying-glass me-1"></i>Search
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-4">
+				<div class="col-lg-3">
+					<div class="card card-sh p-3">
+						<h5 class="mb-3">Categories</h5>
+						<div class="list-group list-group-flush">
+							<a href="/products"
+								th:classappend="${paramValue==''} ? 'active':''"
+								class="list-group-item list-group-item-action border-0 mb-2">All Products</a>
+							<a th:each="c:${categories}" th:href="@{/products(category=${c.name}, ch=${searchValue})}"
+								th:classappend="${paramValue == c.name} ? 'active':''"
+								class="list-group-item list-group-item-action border-0 mb-2">[[${c.name}]]</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-9">
+					<div class="surface-panel p-4">
+						<div class="section-head mb-4">
+							<div>
+								<h2 class="mb-1">Products</h2>
+								<p>Showing [[${totalElements}]] products across your catalog.</p>
+							</div>
+						</div>
+
+						<div class="alert alert-info" th:if="${user != null and user.role == 'ROLE_ADMIN'}">
+							You are previewing the storefront as an admin. Purchase actions are disabled for admin accounts.
+						</div>
+
+						<div class="row g-4" th:if="${productsSize > 0}">
+							<div class="col-md-6 col-xl-4" th:each="p:${products}">
+								<div class="product-card p-3 h-100">
+									<img th:src="${@fileStorageService.resolveProductImage(p.image)}"
+										class="product-thumb" alt="Product image">
+									<div class="p-2 pt-3">
+										<div class="d-flex justify-content-between gap-2 align-items-start">
+											<h5 class="mb-2 text-dark">[[${p.title}]]</h5>
+											<span class="badge-soft" th:if="${p.stock > 0}">[[${p.stock}]] left</span>
+											<span class="badge-soft warning" th:unless="${p.stock > 0}">Out of stock</span>
+										</div>
+										<p class="small text-secondary mb-3">[[${p.category}]]</p>
+										<div class="rating-row mb-3">
+											<div class="rating-stars">
+												<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 1} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 2} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 3} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 4} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 5} ? 'filled' : ''"></i>
+											</div>
+											<span class="rating-value">[[${p.averageRating != null ? p.averageRating : 0.0}]]</span>
+											<span class="rating-meta">([[${p.ratingCount != null ? p.ratingCount : 0}]] reviews)</span>
+										</div>
+										<div class="price-block mb-3">
+											<span class="current"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.discountPrice)}]]</span>
+											<span class="original"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.price)}]]</span>
+											<span class="badge-soft" th:if="${p.discount > 0}">[[${p.discount}]]% off</span>
+										</div>
+										<a th:href="@{'/product/'+${p.id}}" class="btn btn-primary w-100">View Details</a>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="text-center py-5" th:unless="${productsSize > 0}">
+							<h4 class="mb-2">No products found</h4>
+							<p class="text-secondary mb-0">Try another keyword or switch to a different category.</p>
+						</div>
+
+						<div class="row align-items-center mt-4" th:if="${productsSize > 0}">
+							<div class="col-md-5 mb-3 mb-md-0">
+								<span class="text-secondary">Page [[${pageNo + 1}]] of [[${totalPages}]]</span>
+							</div>
+							<div class="col-md-7">
+								<nav>
+									<ul class="pagination justify-content-md-end mb-0">
+										<li class="page-item" th:classappend="${isFirst} ? 'disabled':''">
+											<a class="page-link" th:href="@{/products(pageNo=${pageNo-1},category=${paramValue},ch=${searchValue})}">&laquo;</a>
+										</li>
+										<li class="page-item" th:each="i:${#numbers.sequence(1,totalPages)}"
+											th:classappend="${pageNo+1==i} ? 'active':''">
+											<a class="page-link" th:href="@{/products(pageNo=${i-1},category=${paramValue},ch=${searchValue})}">[[${i}]]</a>
+										</li>
+										<li class="page-item" th:classappend="${isLast} ? 'disabled':''">
+											<a class="page-link" th:href="@{/products(pageNo=${pageNo+1},category=${paramValue},ch=${searchValue})}">&raquo;</a>
+										</li>
+									</ul>
+								</nav>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

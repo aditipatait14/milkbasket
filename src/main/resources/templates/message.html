@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-5">
+			<div class="surface-panel p-5 text-center">
+				<i class="fa-solid fa-circle-info fa-4x text-primary mb-4"></i>
+				<h2 class="mb-3">Update</h2>
+				<p class="lead mb-4">[[${msg}]]</p>
+				<a href="/signin" class="btn btn-primary px-4">Go to Sign In</a>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

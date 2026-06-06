@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">My Wishlist</h2>
+						<p>Products you have saved for later shopping.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<div class="row g-4" th:if="${wishlistItems != null and !#lists.isEmpty(wishlistItems)}">
+					<div class="col-md-6 col-xl-4" th:each="item : ${wishlistItems}">
+						<div class="product-card p-3 h-100">
+							<img th:src="${@fileStorageService.resolveProductImage(item.product.image)}"
+								class="product-thumb" alt="Product image">
+							<div class="p-2 pt-3">
+								<div class="d-flex justify-content-between gap-2 align-items-start">
+									<h5 class="mb-2 text-dark">[[${item.product.title}]]</h5>
+									<span class="badge-soft warning" th:if="${item.product.stock <= 7}">Only [[${item.product.stock}]] left</span>
+									<span class="badge-soft" th:if="${item.product.stock > 7}">In stock</span>
+								</div>
+								<p class="small text-secondary mb-2">[[${item.product.category}]]</p>
+								<div class="rating-row mb-3">
+									<div class="rating-stars">
+										<i class="fa-solid fa-star" th:classappend="${item.product.averageRating != null and item.product.averageRating >= 1} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${item.product.averageRating != null and item.product.averageRating >= 2} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${item.product.averageRating != null and item.product.averageRating >= 3} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${item.product.averageRating != null and item.product.averageRating >= 4} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${item.product.averageRating != null and item.product.averageRating >= 5} ? 'filled' : ''"></i>
+									</div>
+									<span class="rating-meta">[[${item.product.ratingCount != null ? item.product.ratingCount : 0}]] reviews</span>
+								</div>
+								<div class="price-block mb-3">
+									<span class="current"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(item.product.discountPrice)}]]</span>
+									<span class="original"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(item.product.price)}]]</span>
+								</div>
+								<div class="d-flex gap-2">
+									<a th:href="@{'/product/'+${item.product.id}}" class="btn btn-primary w-100">View Details</a>
+									<a th:href="@{'/user/wishlist/remove?pid='+${item.product.id}+'&redirect=/user/wishlist'}" class="btn btn-outline-danger-soft">
+										<i class="fa-solid fa-trash-can"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="text-center py-5" th:unless="${wishlistItems != null and !#lists.isEmpty(wishlistItems)}">
+					<h4 class="mb-2">Your wishlist is empty</h4>
+					<p class="text-secondary mb-3">Browse the catalog and save products you want to revisit.</p>
+					<a href="/products" class="btn btn-primary">Explore Products</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Contact Inbox</h2>
+						<p>Messages submitted from the public contact page.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Name</th>
+								<th>Contact</th>
+								<th>Subject</th>
+								<th>Message</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="contact : ${contacts}">
+								<td>[[${contact.createdAt}]]</td>
+								<td>[[${contact.name}]]</td>
+								<td>
+									<div>[[${contact.email}]]</div>
+									<div class="small text-secondary">[[${contact.phone}]]</div>
+								</td>
+								<td>[[${contact.subject}]]</td>
+								<td>[[${contact.message}]]</td>
+								<td><span class="badge-soft">[[${contact.status}]]</span></td>
+								<td>
+									<a th:href="@{'/admin/contacts/'+${contact.id}}" class="btn btn-sm btn-primary">View</a>
+									<a th:href="@{'/admin/contacts/'+${contact.id}}" class="btn btn-sm btn-outline-brand">Respond</a>
+									<a th:href="@{'/admin/contacts/delete/'+${contact.id}}" class="btn btn-sm btn-danger">Delete</a>
+								</td>
+							</tr>
+							<tr th:if="${contacts == null or #lists.isEmpty(contacts)}">
+								<td colspan="7" class="text-center py-5">
+									<h5 class="mb-2">No contact messages yet</h5>
+									<p class="text-secondary mb-0">New website enquiries will appear here.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

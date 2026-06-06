@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4 p-lg-5">
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<div class="row g-4 align-items-center">
+					<div class="col-lg-6">
+						<img th:src="${@fileStorageService.resolveProductImage(product.image)}"
+							class="product-thumb" style="height: 420px;" alt="Product image">
+					</div>
+					<div class="col-lg-6">
+						<span class="eyebrow mb-3">[[${product.category}]]</span>
+						<h1 class="mb-3">[[${product.title}]]</h1>
+						<p class="text-secondary mb-3">[[${product.description}]]</p>
+
+						<div class="d-flex flex-wrap gap-2 mb-3">
+							<span class="badge-soft" th:if="${product.stock > 0}">Available now</span>
+							<span class="badge-soft warning" th:unless="${product.stock > 0}">Out of stock</span>
+							<span class="badge-soft" th:if="${product.discount > 0}">[[${product.discount}]]% savings</span>
+							<span class="badge-soft">Stock: [[${product.stock}]]</span>
+						</div>
+
+						<div class="rating-row mb-4">
+							<div class="rating-stars">
+								<i class="fa-solid fa-star" th:classappend="${product.averageRating != null and product.averageRating >= 1} ? 'filled' : ''"></i>
+								<i class="fa-solid fa-star" th:classappend="${product.averageRating != null and product.averageRating >= 2} ? 'filled' : ''"></i>
+								<i class="fa-solid fa-star" th:classappend="${product.averageRating != null and product.averageRating >= 3} ? 'filled' : ''"></i>
+								<i class="fa-solid fa-star" th:classappend="${product.averageRating != null and product.averageRating >= 4} ? 'filled' : ''"></i>
+								<i class="fa-solid fa-star" th:classappend="${product.averageRating != null and product.averageRating >= 5} ? 'filled' : ''"></i>
+							</div>
+							<span class="rating-value">[[${product.averageRating != null ? product.averageRating : 0.0}]] / 5</span>
+							<span class="rating-meta">([[${product.ratingCount != null ? product.ratingCount : 0}]] public reviews)</span>
+						</div>
+
+						<div class="price-block mb-4">
+							<span class="current"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(product.discountPrice)}]]</span>
+							<span class="original"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(product.price)}]]</span>
+						</div>
+
+						<div class="row g-3 mb-4">
+							<div class="col-md-4">
+								<div class="info-card p-3 h-100 text-center">
+									<i class="fas fa-snowflake fa-2x mb-2 text-primary"></i>
+									<p class="mb-0 small">Freshness-preserving packaging</p>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="info-card p-3 h-100 text-center">
+									<i class="fas fa-rotate-left fa-2x mb-2 text-warning"></i>
+									<p class="mb-0 small">Easy replacement support</p>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="info-card p-3 h-100 text-center">
+									<i class="fas fa-truck-fast fa-2x mb-2 text-success"></i>
+									<p class="mb-0 small">Fast doorstep delivery</p>
+								</div>
+							</div>
+						</div>
+
+						<th:block th:if="${product.stock > 0}">
+							<th:block th:if="${user==null}">
+								<a href="/signin" class="btn btn-primary btn-lg w-100">Sign in to Add to Cart</a>
+							</th:block>
+							<th:block th:if="${user!=null and user.role=='ROLE_USER'}">
+								<a th:href="@{'/user/addCart?pid='+${product.id}+'&uid='+${user.id}}"
+									class="btn btn-primary btn-lg w-100">Add To Cart</a>
+							</th:block>
+							<th:block th:if="${user!=null and user.role=='ROLE_ADMIN'}">
+								<a href="/admin/products" class="btn btn-outline-brand btn-lg w-100">Admin Preview Only</a>
+							</th:block>
+						</th:block>
+
+						<th:block th:unless="${product.stock > 0}">
+							<a href="#" class="btn btn-warning btn-lg w-100 disabled">Currently Out of Stock</a>
+						</th:block>
+
+						<div class="wishlist-panel mt-3" th:if="${user != null and user.role == 'ROLE_USER'}">
+							<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+								<div>
+									<h6 class="mb-1">Save for later</h6>
+									<p class="small text-secondary mb-0">Keep this product in your wishlist and come back anytime.</p>
+								</div>
+								<div>
+									<a th:if="${wishlistProductIds != null and wishlistProductIds.contains(product.id)}"
+										th:href="@{'/user/wishlist/remove?pid='+${product.id}+'&redirect=/product/'+${product.id}}"
+										class="btn btn-outline-danger-soft">
+										<i class="fa-solid fa-heart-crack me-1"></i>Remove from Wishlist
+									</a>
+									<a th:unless="${wishlistProductIds != null and wishlistProductIds.contains(product.id)}"
+										th:href="@{'/user/wishlist/add?pid='+${product.id}+'&redirect=/product/'+${product.id}}"
+										class="btn btn-outline-brand">
+										<i class="fa-solid fa-heart me-1"></i>Add to Wishlist
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="surface-panel p-4 p-lg-5 mt-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Ratings and Feedback</h2>
+						<p>Public ratings help everyone make better choices.</p>
+					</div>
+				</div>
+
+				<div class="row g-4">
+					<div class="col-lg-5" th:if="${user != null and user.role == 'ROLE_USER'}">
+						<div class="feedback-card h-100">
+							<h5 class="mb-3" th:text="${existingFeedback != null ? 'Update Your Feedback' : 'Share Your Feedback'}"></h5>
+							<form action="/user/feedback/save" method="post">
+								<input type="hidden" name="productId" th:value="${product.id}">
+								<div class="mb-3">
+									<label class="form-label">Rating</label>
+									<select name="rating" class="form-select" required>
+										<option value="">Choose rating</option>
+										<option value="5" th:selected="${existingFeedback != null and existingFeedback.rating == 5}">5 Stars</option>
+										<option value="4" th:selected="${existingFeedback != null and existingFeedback.rating == 4}">4 Stars</option>
+										<option value="3" th:selected="${existingFeedback != null and existingFeedback.rating == 3}">3 Stars</option>
+										<option value="2" th:selected="${existingFeedback != null and existingFeedback.rating == 2}">2 Stars</option>
+										<option value="1" th:selected="${existingFeedback != null and existingFeedback.rating == 1}">1 Star</option>
+									</select>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Feedback</label>
+									<textarea name="comment" rows="5" class="form-control"
+										placeholder="Tell other customers and the admin what you liked or what can improve.">[[${existingFeedback != null ? existingFeedback.comment : ''}]]</textarea>
+								</div>
+								<button class="btn btn-primary w-100">Save Rating and Feedback</button>
+							</form>
+						</div>
+					</div>
+
+					<div th:class="${user != null and user.role == 'ROLE_USER'} ? 'col-lg-7' : 'col-12'">
+						<div class="row g-3" th:if="${feedbacks != null and !#lists.isEmpty(feedbacks)}">
+							<div class="col-12" th:each="feedback : ${feedbacks}">
+								<div class="feedback-card">
+									<div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+										<div>
+											<h6 class="mb-1">[[${feedback.user.name}]]</h6>
+											<div class="rating-stars">
+												<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 1} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 2} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 3} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 4} ? 'filled' : ''"></i>
+												<i class="fa-solid fa-star" th:classappend="${feedback.rating >= 5} ? 'filled' : ''"></i>
+											</div>
+										</div>
+										<span class="rating-meta">[[${feedback.updatedAt != null ? #temporals.format(feedback.updatedAt, 'dd MMM yyyy, hh:mm a') : ''}]]</span>
+									</div>
+									<p class="mb-0 text-secondary">[[${feedback.comment}]]</p>
+								</div>
+							</div>
+						</div>
+						<div class="feedback-card text-center" th:unless="${feedbacks != null and !#lists.isEmpty(feedbacks)}">
+							<h5 class="mb-2">No feedback yet</h5>
+							<p class="mb-0 text-secondary">Be the first customer to rate this product.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

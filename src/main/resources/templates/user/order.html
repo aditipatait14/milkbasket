@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div id="payment-message" class="alert d-none"></div>
+
+			<th:block th:if="${session.errorMsg}">
+				<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+				<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+			</th:block>
+
+			<form action="/user/save-order" method="post" id="orders" novalidate
+				th:attr="data-online-payment-enabled=${onlinePaymentEnabled},data-create-payment-url=@{/user/create-payment-order},data-checkout-script-url='https://checkout.razorpay.com/v1/checkout.js'">
+				<div class="row g-4">
+					<div class="col-lg-7">
+						<div class="surface-panel p-4">
+							<h2 class="mb-1">Billing Details</h2>
+							<p class="text-secondary mb-4">Use the delivery address where the order should arrive.</p>
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label class="form-label">First Name</label>
+									<input type="text" name="firstName" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Last Name</label>
+									<input type="text" name="lastName" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Email</label>
+									<input type="email" name="email" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Mobile Number</label>
+									<input type="text" name="mobileNo" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Address</label>
+									<input type="text" name="address" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">City</label>
+									<input type="text" name="city" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">State</label>
+									<input type="text" name="state" required class="form-control">
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Pincode</label>
+									<input type="text" name="pincode" required class="form-control">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-5">
+						<div class="summary-card mb-4">
+							<h3 class="mb-3">Order Summary</h3>
+							<table class="table table-borderless mb-0">
+								<tbody>
+									<tr>
+										<td>Subtotal</td>
+										<td class="text-end"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${orderPrice}]]</td>
+									</tr>
+									<tr>
+										<td>Delivery Fee</td>
+										<td class="text-end"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${deliveryFee}]]</td>
+									</tr>
+									<tr>
+										<td>Tax ([[${taxRatePercent}]]%)</td>
+										<td class="text-end"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${taxAmount}]]</td>
+									</tr>
+									<tr class="border-top">
+										<td class="fw-bold">Total</td>
+										<td class="fw-bold text-end"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${totalOrderPrice}]]</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="summary-card">
+							<h3 class="mb-3">Payment Method</h3>
+							<div class="mb-3">
+								<label class="form-label">Select Payment Type</label>
+								<select required name="paymentType" class="form-select">
+									<option value="">--select--</option>
+									<option value="COD">Cash On Delivery</option>
+									<option value="ONLINE">Online Payment (Razorpay)</option>
+								</select>
+							</div>
+
+							<p class="small text-secondary mb-3" th:if="${onlinePaymentEnabled}">
+								Online payments are verified before your order is saved.
+							</p>
+							<p class="small text-danger mb-3" th:unless="${onlinePaymentEnabled}">
+								Online payment is disabled until Razorpay credentials are configured.
+							</p>
+
+							<input type="hidden" name="razorpayOrderId" id="razorpayOrderId">
+							<input type="hidden" name="razorpayPaymentId" id="razorpayPaymentId">
+							<input type="hidden" name="razorpaySignature" id="razorpaySignature">
+
+							<button class="btn btn-primary w-100 py-3" id="placeOrderBtn">Place Order</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
+	<script th:if="${onlinePaymentEnabled}" id="razorpay-checkout-script"
+		src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>

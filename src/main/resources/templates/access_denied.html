@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-5">
+			<div class="surface-panel p-5 text-center">
+				<i class="fa-solid fa-ban fa-4x text-danger mb-4"></i>
+				<h1 class="mb-3">Access Denied</h1>
+				<p class="lead text-secondary mb-4">This action is only available for the correct account type. Admins can preview the storefront, but customer purchase actions are disabled.</p>
+				<div class="d-flex justify-content-center gap-3 flex-wrap">
+					<a href="/" class="btn btn-primary px-4">Go Home</a>
+					<a href="/admin/" class="btn btn-outline-brand px-4">Open Dashboard</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-5">
+			<div class="surface-panel p-5 text-center">
+				<i class="fa-solid fa-circle-check fa-5x text-success mb-4"></i>
+				<h1 class="mb-3">Order placed successfully</h1>
+				<p class="lead text-secondary mb-3" th:if="${session.orderSuccessMessage}">[[${session.orderSuccessMessage}]]</p>
+				<p class="mb-1" th:if="${session.paymentType}">
+					Payment Mode: <span class="fw-semibold">[[${session.paymentType}]]</span>
+				</p>
+				<p class="mb-4" th:if="${session.paymentReference}">
+					Payment Reference: <span class="fw-semibold">[[${session.paymentReference}]]</span>
+				</p>
+				<p class="text-secondary mb-4">You can download the order receipt anytime from your <strong>My Orders</strong> page.</p>
+				<div class="d-flex justify-content-center flex-wrap gap-3">
+					<a href="/" class="btn btn-primary px-4">Back Home</a>
+					<a href="/user/user-orders" class="btn btn-outline-brand px-4">View Orders</a>
+				</div>
+				<th:block th:text="${@commnServiceImpl.removeOrderSuccessData()}"></th:block>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

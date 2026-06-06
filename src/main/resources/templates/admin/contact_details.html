@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="row g-4">
+				<div class="col-lg-5">
+					<div class="surface-panel p-4">
+						<div class="d-flex justify-content-between align-items-start mb-3">
+							<div>
+								<h2 class="mb-1">Contact Details</h2>
+								<p class="text-secondary mb-0">Submitted on [[${contact.createdAt}]]</p>
+							</div>
+							<span class="badge-soft">[[${contact.status}]]</span>
+						</div>
+
+						<div class="mini-meta d-block">
+							<p><strong>Name:</strong> [[${contact.name}]]</p>
+							<p><strong>Email:</strong> [[${contact.email}]]</p>
+							<p><strong>Phone:</strong> [[${contact.phone}]]</p>
+							<p><strong>Subject:</strong> [[${contact.subject}]]</p>
+						</div>
+
+						<div class="card p-3 mt-3">
+							<h5 class="mb-2">Customer Message</h5>
+							<p class="mb-0">[[${contact.message}]]</p>
+						</div>
+
+						<div class="card p-3 mt-3" th:if="${contact.adminResponse != null and !contact.adminResponse.isBlank()}">
+							<h5 class="mb-2">Last Response</h5>
+							<p class="mb-2">[[${contact.adminResponse}]]</p>
+							<p class="small text-secondary mb-0">Responded at [[${contact.respondedAt}]]</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-7">
+					<div class="surface-panel p-4">
+						<h2 class="mb-3">Send Response</h2>
+
+						<th:block th:if="${session.succMsg}">
+							<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+							<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						</th:block>
+						<th:block th:if="${session.errorMsg}">
+							<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+							<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+						</th:block>
+
+						<form action="/admin/contacts/respond" method="post">
+							<input type="hidden" name="id" th:value="${contact.id}">
+							<div class="mb-3">
+								<label class="form-label">Reply Message</label>
+								<textarea class="form-control" name="responseMessage" rows="8" required
+									th:text="${contact.adminResponse}"></textarea>
+							</div>
+							<div class="d-flex flex-wrap gap-3">
+								<button class="btn btn-primary px-4">Send Reply</button>
+								<a href="/admin/contacts" class="btn btn-outline-brand px-4">Back to Inbox</a>
+								<a th:href="@{'/admin/contacts/delete/'+${contact.id}}" class="btn btn-danger px-4">Delete Message</a>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

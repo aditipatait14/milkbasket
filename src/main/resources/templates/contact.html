@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4 p-lg-5 mb-4">
+				<div class="row g-4 align-items-center">
+					<div class="col-lg-6">
+						<span class="eyebrow"><i class="fa-solid fa-headset"></i> We are here to help</span>
+						<h1 class="mt-3 mb-3">Contact MilkBasket Support</h1>
+						<p class="text-secondary">Need help with orders, inventory setup, delivery issues or product updates? Send us a message and your request will also appear in the admin contact inbox.</p>
+						<div class="d-flex flex-column gap-3 mt-4">
+							<div class="contact-chip"><i class="fa-solid fa-phone"></i> +91 901256549</div>
+							<div class="contact-chip"><i class="fa-solid fa-envelope"></i> support@gmail.com</div>
+							<div class="contact-chip"><i class="fa-solid fa-location-dot"></i> Shivtej dairy & siznals, Shivane, Pune</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="contact-card">
+							<h3 class="mb-3">Send a Message</h3>
+
+							<th:block th:if="${session.succMsg}">
+								<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+								<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+							</th:block>
+
+							<form action="/contact" method="post">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label">Full Name</label>
+										<input class="form-control" type="text" name="name" required>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label">Phone</label>
+										<input class="form-control" type="text" name="phone">
+									</div>
+									<div class="col-12">
+										<label class="form-label">Email</label>
+										<input class="form-control" type="email" name="email" required>
+									</div>
+									<div class="col-12">
+										<label class="form-label">Subject</label>
+										<input class="form-control" type="text" name="subject" required>
+									</div>
+									<div class="col-12">
+										<label class="form-label">Message</label>
+										<textarea class="form-control" name="message" rows="5" required></textarea>
+									</div>
+								</div>
+								<button class="btn btn-primary w-100 py-3 mt-4">Submit Request</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

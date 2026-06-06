@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Product Inventory</h2>
+						<p>Total products: [[${totalElements}]] | Low-stock alert triggers at [[${lowStockThreshold}]] units.</p>
+					</div>
+					<a href="/admin/loadAddProduct" class="btn btn-primary">Add Product</a>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<form action="/admin/products" method="get" class="mb-4">
+					<div class="input-group">
+						<input type="text" class="form-control" name="ch" placeholder="Search by product, category or description" th:value="${param.ch}">
+						<button class="btn btn-primary px-4">Search</button>
+					</div>
+				</form>
+
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Sl No</th>
+								<th>Image</th>
+								<th>Title</th>
+								<th>Category</th>
+								<th>Price</th>
+								<th>Cost</th>
+								<th>Discount</th>
+								<th>Final Price</th>
+								<th>Rating</th>
+								<th>Status</th>
+								<th>Stock</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="p, stat : ${products}">
+								<td>[[${stat.count}]]</td>
+								<td><img th:src="${@fileStorageService.resolveProductImage(p.image)}"
+									width="64" height="64" style="border-radius: 18px; object-fit: cover;" alt="Product"></td>
+								<td>[[${p.title}]]</td>
+								<td>[[${p.category}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.price)}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.costPrice)}]]</td>
+								<td>[[${p.discount}]]%</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.discountPrice)}]]</td>
+								<td>
+									<div class="rating-stars mb-1">
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 1} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 2} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 3} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 4} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 5} ? 'filled' : ''"></i>
+									</div>
+									<div class="small text-secondary">[[${p.averageRating != null ? p.averageRating : 0.0}]] ([[${p.ratingCount != null ? p.ratingCount : 0}]])</div>
+								</td>
+								<td><span class="badge-soft" th:text="${p.isActive ? 'Active' : 'Inactive'}"></span></td>
+								<td>
+									<div th:if="${p.stock <= lowStockThreshold}">
+										<span class="badge-soft danger">[[${p.stock}]] left</span>
+										<div class="small text-danger mt-1">Low stock alert</div>
+									</div>
+									<span class="badge-soft" th:if="${p.stock > lowStockThreshold}">[[${p.stock}]] available</span>
+								</td>
+								<td>
+									<div class="d-flex flex-column gap-2">
+										<form action="/admin/update-stock" method="post" class="stock-form">
+											<input type="hidden" name="productId" th:value="${p.id}">
+											<input type="number" min="0" name="stock" th:value="${p.stock}" class="form-control form-control-sm">
+											<button class="btn btn-sm btn-outline-brand" type="submit">Update</button>
+										</form>
+										<div class="d-flex gap-2">
+											<a th:href="@{'/admin/editProduct/'+${p.id}}" class="btn btn-sm btn-primary">Edit</a>
+											<a th:href="@{'/admin/deleteProduct/'+${p.id}}" class="btn btn-sm btn-danger">Delete</a>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<nav>
+					<ul class="pagination mb-0">
+						<li class="page-item" th:classappend="${isFirst} ? 'disabled':''">
+							<a class="page-link" th:href="@{/admin/products(pageNo=${pageNo-1}, ch=${param.ch})}">&laquo;</a>
+						</li>
+						<li class="page-item" th:each="i:${#numbers.sequence(1,totalPages)}"
+							th:classappend="${pageNo+1==i}?'active':''">
+							<a class="page-link" th:href="@{/admin/products(pageNo=${i-1}, ch=${param.ch})}">[[${i}]]</a>
+						</li>
+						<li class="page-item" th:classappend="${isLast} ? 'disabled':''">
+							<a class="page-link" th:href="@{/admin/products(pageNo=${pageNo+1}, ch=${param.ch})}">&raquo;</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

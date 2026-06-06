@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4 p-lg-5">
+				<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+					<div>
+						<span class="eyebrow"><i class="fa-solid fa-sliders"></i> Checkout controls</span>
+						<h2 class="mt-2 mb-1">Store Pricing Settings</h2>
+						<p class="text-secondary mb-0">Control delivery charge and the dairy tax rate used during checkout.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<form action="/admin/settings" method="post" class="row g-4">
+					<div class="col-md-6">
+						<label class="form-label">Delivery Charge (Rs)</label>
+						<input type="number" min="0" step="0.01" name="deliveryFee" class="form-control"
+							th:value="${storeSettings.deliveryFee}" required>
+						<div class="form-text">Current request applied: set this to 50 for the live checkout summary.</div>
+					</div>
+
+					<div class="col-md-6">
+						<label class="form-label">Tax Rate (%)</label>
+						<input type="number" min="0" max="5" step="0.01" name="taxRatePercent" class="form-control"
+							th:value="${storeSettings.taxRatePercent}" required>
+						<div class="form-text">Kept within 0% to 5% for dairy checkout so you can choose the right rate for each product mix.</div>
+					</div>
+
+					<div class="col-12">
+						<div class="alert alert-info mb-0">
+							Some dairy items can be nil-rated while others can be 5% depending on packaging and product type, so this screen keeps the tax configurable within that range.
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-4">
+						<button class="btn btn-primary w-100">Save Settings</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

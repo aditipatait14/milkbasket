@@ -1,0 +1,21 @@
+# Maven
+target/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.factorypath
+
+# Generated files
+bin/
+
+# Local Maven directories
+.maven-user/
+.mvn-home/
+
+# Uploads
+uploads/
+
+# Logs
+*.log

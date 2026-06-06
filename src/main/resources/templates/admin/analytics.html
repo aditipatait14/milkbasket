@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4 p-lg-5 mb-4">
+				<span class="eyebrow"><i class="fa-solid fa-chart-pie"></i> Overall business analytics</span>
+				<h1 class="mt-3 mb-2">Sales, order flow and category performance overview</h1>
+				<p class="text-secondary mb-0">This dashboard now tracks sales health, profit quality, payment mix and category momentum so the admin panel shows real business movement instead of only static totals.</p>
+			</div>
+
+			<div class="row g-4 mb-4">
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Total Revenue</span>
+						<span class="value"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(analytics.totalRevenue)}]]</span>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Total Profit</span>
+						<span class="value"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(analytics.totalProfit)}]]</span>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Total Loss</span>
+						<span class="value"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(analytics.totalLoss)}]]</span>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Inventory Value</span>
+						<span class="value"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(analytics.currentInventoryValue)}]]</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-4 mb-4">
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Orders</span>
+						<span class="value">[[${analytics.totalOrders}]]</span>
+						<div class="small text-secondary mt-2">Delivered: [[${analytics.deliveredOrders}]]</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Paid Orders</span>
+						<span class="value">[[${analytics.paidOrders}]]</span>
+						<div class="small text-secondary mt-2">Cancelled: [[${analytics.cancelledOrders}]]</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Units Sold</span>
+						<span class="value">[[${analytics.totalUnitsSold}]]</span>
+						<div class="small text-secondary mt-2">Avg order value:
+							<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+							[[${@commnServiceImpl.formatPrice(analytics.averageOrderValue)}]]
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-xl-3">
+					<div class="analytics-stat">
+						<span class="label">Customer Ratings</span>
+						<span class="value">[[${analytics.feedbackCount}]]</span>
+						<div class="small text-secondary mt-2">Margin: [[${analytics.profitMarginPercent}]]%</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-4 mb-4">
+				<div class="col-lg-7">
+					<div class="surface-panel p-4 h-100">
+						<div class="section-head analytics-stack-head">
+							<div>
+								<h2 class="mb-1">Financial Performance</h2>
+								<p>Relative comparison between sales, cost, profit and losses.</p>
+							</div>
+						</div>
+
+						<div class="analytics-stack" th:if="${analytics.financialHighlights != null and !#lists.isEmpty(analytics.financialHighlights)}">
+							<div class="analytics-stack-item" th:each="point : ${analytics.financialHighlights}">
+								<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+									<div>
+										<div class="fw-semibold">[[${point.label}]]</div>
+										<div class="small text-secondary">[[${point.helperText}]]</div>
+									</div>
+									<div class="fw-bold">
+										<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+										[[${@commnServiceImpl.formatPrice(point.value)}]]
+									</div>
+								</div>
+								<div class="analytics-progress">
+									<div class="analytics-progress-bar" th:style="'width:' + ${point.percentage} + '%'"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-5">
+					<div class="surface-panel p-4 h-100">
+						<div class="section-head analytics-stack-head">
+							<div>
+								<h2 class="mb-1">Order & Payment Mix</h2>
+								<p>Distribution of fulfilment stages and payment behavior.</p>
+							</div>
+						</div>
+
+						<div class="analytics-stack" th:if="${analytics.orderStatusBreakdown != null and !#lists.isEmpty(analytics.orderStatusBreakdown)}">
+							<div class="analytics-stack-item compact" th:each="point : ${analytics.orderStatusBreakdown}">
+								<div class="d-flex justify-content-between gap-3 mb-2">
+									<div class="fw-semibold">[[${point.label}]]</div>
+									<div>[[${#numbers.formatDecimal(point.value, 0, 0)}]]</div>
+								</div>
+								<div class="analytics-progress thin">
+									<div class="analytics-progress-bar alt" th:style="'width:' + ${point.percentage} + '%'"></div>
+								</div>
+								<div class="small text-secondary mt-2">[[${point.helperText}]]</div>
+							</div>
+						</div>
+
+						<div class="analytics-mini-grid mt-4">
+							<div class="mini-panel">
+								<div class="mini-panel-label">Online Payments</div>
+								<div class="mini-panel-value">[[${analytics.onlineOrders}]]</div>
+							</div>
+							<div class="mini-panel">
+								<div class="mini-panel-label">Cash On Delivery</div>
+								<div class="mini-panel-value">[[${analytics.codOrders}]]</div>
+							</div>
+							<div class="mini-panel">
+								<div class="mini-panel-label">Wishlist Saves</div>
+								<div class="mini-panel-value">[[${analytics.wishlistEntries}]]</div>
+							</div>
+							<div class="mini-panel">
+								<div class="mini-panel-label">Low Stock Items</div>
+								<div class="mini-panel-value">[[${analytics.lowStockCount}]]</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-4 mb-4">
+				<div class="col-lg-7">
+					<div class="surface-panel p-4">
+						<div class="section-head analytics-stack-head">
+							<div>
+								<h2 class="mb-1">Monthly Sales Trend</h2>
+								<p>Last six months of revenue based on non-cancelled orders.</p>
+							</div>
+						</div>
+
+						<div class="analytics-bars" th:if="${analytics.monthlySales != null and !#lists.isEmpty(analytics.monthlySales)}">
+							<div class="analytics-bar-item" th:each="point : ${analytics.monthlySales}">
+								<div class="analytics-bar-value">
+									<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+									[[${@commnServiceImpl.formatPrice(point.value)}]]
+								</div>
+								<div class="analytics-bar-track">
+									<div class="analytics-bar-fill" th:style="'height:' + ${point.percentage} + '%'"></div>
+								</div>
+								<div class="analytics-bar-label">[[${point.label}]]</div>
+								<div class="analytics-bar-meta">[[${point.helperText}]]</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-5">
+					<div class="surface-panel p-4 h-100">
+						<div class="section-head analytics-stack-head">
+							<div>
+								<h2 class="mb-1">Category Sales</h2>
+								<p>Top categories ranked by revenue contribution.</p>
+							</div>
+						</div>
+
+						<div class="analytics-stack" th:if="${analytics.categoryPerformance != null and !#lists.isEmpty(analytics.categoryPerformance)}">
+							<div class="analytics-stack-item" th:each="point : ${analytics.categoryPerformance}">
+								<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+									<div>
+										<div class="fw-semibold">[[${point.label}]]</div>
+										<div class="small text-secondary">[[${point.helperText}]]</div>
+									</div>
+									<div class="fw-bold">
+										<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+										[[${@commnServiceImpl.formatPrice(point.value)}]]
+									</div>
+								</div>
+								<div class="analytics-progress">
+									<div class="analytics-progress-bar warm" th:style="'width:' + ${point.percentage} + '%'"></div>
+								</div>
+							</div>
+						</div>
+
+						<div class="text-center py-4" th:if="${analytics.categoryPerformance == null or #lists.isEmpty(analytics.categoryPerformance)}">
+							<p class="text-secondary mb-0">Category sales will appear here once orders are placed.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row g-4">
+				<div class="col-lg-8">
+					<div class="surface-panel p-4">
+						<div class="section-head">
+							<div>
+								<h2 class="mb-1">Top Selling Products</h2>
+								<p>Best-performing items by units sold and revenue.</p>
+							</div>
+						</div>
+						<div class="table-responsive">
+							<table class="table align-middle">
+								<thead>
+									<tr>
+										<th>Product</th>
+										<th>Units Sold</th>
+										<th>Revenue</th>
+										<th>Profit/Loss</th>
+										<th>Rating</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item : ${analytics.topProducts}">
+										<td>[[${item.productTitle}]]</td>
+										<td>[[${item.unitsSold}]]</td>
+										<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(item.revenue)}]]</td>
+										<td>
+											<span th:if="${item.profit >= 0}" class="text-success fw-semibold">
+												<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(item.profit)}]]
+											</span>
+											<span th:if="${item.profit < 0}" class="text-danger fw-semibold">
+												-<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(item.profit * -1)}]]
+											</span>
+										</td>
+										<td>[[${item.averageRating}]] ([[${item.ratingCount}]])</td>
+									</tr>
+									<tr th:if="${analytics.topProducts == null or #lists.isEmpty(analytics.topProducts)}">
+										<td colspan="5" class="text-center text-secondary py-4">No completed sales data available yet.</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-4">
+					<div class="surface-panel p-4 h-100">
+						<div class="section-head">
+							<div>
+								<h2 class="mb-1">Low Stock Watchlist</h2>
+								<p>Active products at or below [[${lowStockThreshold}]] units.</p>
+							</div>
+						</div>
+						<div class="d-grid gap-3" th:if="${analytics.lowStockProducts != null and !#lists.isEmpty(analytics.lowStockProducts)}">
+							<div class="feedback-card" th:each="p : ${analytics.lowStockProducts}">
+								<div class="d-flex justify-content-between gap-2">
+									<div>
+										<h6 class="mb-1">[[${p.title}]]</h6>
+										<div class="small text-secondary">[[${p.category}]]</div>
+									</div>
+									<span class="badge-soft danger">[[${p.stock}]] left</span>
+								</div>
+							</div>
+						</div>
+						<div th:unless="${analytics.lowStockProducts != null and !#lists.isEmpty(analytics.lowStockProducts)}">
+							<p class="mb-0 text-secondary">No low-stock alerts right now.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

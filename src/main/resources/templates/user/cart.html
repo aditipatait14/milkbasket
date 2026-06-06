@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Your Cart</h2>
+						<p>Review quantities before moving to checkout.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Sl No</th>
+								<th>Product</th>
+								<th>Price</th>
+								<th class="text-center">Quantity</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="cart,c:${carts}">
+								<td>[[${c.count}]]</td>
+								<td>
+									<div class="d-flex align-items-center gap-3">
+										<img th:src="${@fileStorageService.resolveProductImage(cart.product.image)}"
+											width="72" height="72" style="border-radius: 18px; object-fit: cover;" alt="Product">
+										<div>
+											<div class="fw-semibold">[[${cart.product.title}]]</div>
+											<div class="small text-secondary">[[${cart.product.category}]]</div>
+										</div>
+									</div>
+								</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${cart.product.discountPrice}]]</td>
+								<td class="text-center">
+									<a class="btn btn-sm btn-outline-brand"
+										th:href="@{'/user/cartQuantityUpdate?sy=de&cid='+${cart.id}}">
+										<i class="fa-solid fa-minus"></i>
+									</a>
+									<span class="mx-2 fw-semibold">[[${cart.quantity}]]</span>
+									<a class="btn btn-sm btn-outline-brand"
+										th:href="@{'/user/cartQuantityUpdate?sy=in&cid='+${cart.id}}">
+										<i class="fa-solid fa-plus"></i>
+									</a>
+								</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${cart.totalPrice}]]</td>
+							</tr>
+							<tr th:if="${carts == null or #lists.isEmpty(carts)}">
+								<td colspan="5" class="text-center py-5">
+									<h5 class="mb-2">Your cart is empty</h5>
+									<p class="text-secondary mb-0">Add some fresh dairy products to continue.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4"
+					th:if="${carts != null and !#lists.isEmpty(carts)}">
+					<div class="summary-card">
+						<strong>Total</strong>
+						<div class="fs-4 mt-1"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${totalOrderPrice}]]</div>
+					</div>
+					<a href="/user/orders" class="btn btn-primary btn-lg px-4">Proceed to Checkout</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Orders</h2>
+						<p>Search by order id or manage delivery status for recent orders.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<form action="/admin/search-order" method="get" class="mb-4">
+					<div class="input-group">
+						<input type="text" class="form-control" name="orderId" placeholder="Enter order id">
+						<button class="btn btn-primary px-4">Search Order</button>
+					</div>
+				</form>
+
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Order Id</th>
+								<th>Delivery Details</th>
+								<th>Date</th>
+								<th>Product</th>
+								<th>Amount</th>
+								<th>Payment</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:if="${srch and orderDtls != null}">
+								<tr>
+									<td>[[${orderDtls.orderId}]]</td>
+									<td>
+										<div class="fw-semibold">[[${orderDtls.orderAddress.firstName+' '+orderDtls.orderAddress.lastName}]]</div>
+										<div class="small text-secondary">[[${orderDtls.orderAddress.email}]]</div>
+										<div class="small text-secondary">[[${orderDtls.orderAddress.mobileNo}]]</div>
+										<div class="small text-secondary">[[${orderDtls.orderAddress.address}]], [[${orderDtls.orderAddress.city}]], [[${orderDtls.orderAddress.state}]] - [[${orderDtls.orderAddress.pincode}]]</div>
+									</td>
+									<td>
+										<div>[[${orderDtls.orderDateTime != null ? #temporals.format(orderDtls.orderDateTime, 'dd MMM yyyy, hh:mm a') : orderDtls.orderDate}]]</div>
+										<div class="small text-secondary" th:if="${orderDtls.paymentRecordedAt != null}">
+											Paid: [[${#temporals.format(orderDtls.paymentRecordedAt, 'dd MMM yyyy, hh:mm a')}]]
+										</div>
+									</td>
+									<td>[[${orderDtls.product.title}]]</td>
+									<td>
+										<div>Qty: [[${orderDtls.quantity}]]</div>
+										<div class="small text-secondary"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${orderDtls.quantity * orderDtls.price}]]</div>
+									</td>
+									<td>
+										<div>[[${orderDtls.paymentType}]]</div>
+										<div class="small text-secondary">[[${orderDtls.paymentStatus}]]</div>
+										<div class="small text-secondary" th:if="${orderDtls.paymentId!=null}">Ref: [[${orderDtls.paymentId}]]</div>
+									</td>
+									<td><span class="badge-soft">[[${orderDtls.status}]]</span></td>
+									<td>
+										<form action="/admin/update-order-status" method="post">
+											<div class="d-grid gap-2">
+												<select class="form-select" name="st">
+													<option value="">--select--</option>
+													<option value="1">In Progress</option>
+													<option value="2">Order Received</option>
+													<option value="3">Product Packed</option>
+													<option value="4">Out for Delivery</option>
+													<option value="5">Delivered</option>
+													<option value="6">Cancelled</option>
+												</select>
+												<input th:value="${orderDtls.id}" name="id" type="hidden">
+												<button class="btn btn-sm btn-primary"
+													th:disabled="${orderDtls.status=='Cancelled' || orderDtls.status=='Delivered'}">Update</button>
+											</div>
+										</form>
+									</td>
+								</tr>
+							</th:block>
+
+							<th:block th:if="${srch and orderDtls == null}">
+								<tr>
+									<td colspan="8" class="text-center py-4">No order matched that id.</td>
+								</tr>
+							</th:block>
+
+							<th:block th:unless="${srch}">
+								<tr th:each="o:${orders}">
+									<td>[[${o.orderId}]]</td>
+									<td>
+										<div class="fw-semibold">[[${o.orderAddress.firstName+' '+o.orderAddress.lastName}]]</div>
+										<div class="small text-secondary">[[${o.orderAddress.email}]]</div>
+										<div class="small text-secondary">[[${o.orderAddress.mobileNo}]]</div>
+										<div class="small text-secondary">[[${o.orderAddress.address}]], [[${o.orderAddress.city}]], [[${o.orderAddress.state}]] - [[${o.orderAddress.pincode}]]</div>
+									</td>
+									<td>
+										<div>[[${o.orderDateTime != null ? #temporals.format(o.orderDateTime, 'dd MMM yyyy, hh:mm a') : o.orderDate}]]</div>
+										<div class="small text-secondary" th:if="${o.paymentRecordedAt != null}">
+											Paid: [[${#temporals.format(o.paymentRecordedAt, 'dd MMM yyyy, hh:mm a')}]]
+										</div>
+									</td>
+									<td>[[${o.product.title}]]</td>
+									<td>
+										<div>Qty: [[${o.quantity}]]</div>
+										<div class="small text-secondary"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${o.quantity * o.price}]]</div>
+									</td>
+									<td>
+										<div>[[${o.paymentType}]]</div>
+										<div class="small text-secondary">[[${o.paymentStatus}]]</div>
+										<div class="small text-secondary" th:if="${o.paymentId!=null}">Ref: [[${o.paymentId}]]</div>
+									</td>
+									<td><span class="badge-soft">[[${o.status}]]</span></td>
+									<td>
+										<form action="/admin/update-order-status" method="post">
+											<div class="d-grid gap-2">
+												<select class="form-select" name="st">
+													<option value="">--select--</option>
+													<option value="1">In Progress</option>
+													<option value="2">Order Received</option>
+													<option value="3">Product Packed</option>
+													<option value="4">Out for Delivery</option>
+													<option value="5">Delivered</option>
+													<option value="6">Cancelled</option>
+												</select>
+												<input th:value="${o.id}" name="id" type="hidden">
+												<button class="btn btn-sm btn-primary"
+													th:disabled="${o.status=='Cancelled' || o.status=='Delivered'}">Update</button>
+											</div>
+										</form>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+				</div>
+
+				<th:block th:if="${!srch}">
+					<nav>
+						<ul class="pagination mb-0">
+							<li class="page-item" th:classappend="${isFirst} ? 'disabled':''">
+								<a class="page-link" th:href="@{'/admin/orders?pageNo='+${pageNo-1}}">&laquo;</a>
+							</li>
+							<li class="page-item" th:each="i:${#numbers.sequence(1,totalPages)}"
+								th:classappend="${pageNo+1==i}?'active':''">
+								<a class="page-link" th:href="@{'/admin/orders?pageNo='+${i-1}}">[[${i}]]</a>
+							</li>
+							<li class="page-item" th:classappend="${isLast} ? 'disabled':''">
+								<a class="page-link" th:href="@{'/admin/orders?pageNo='+${pageNo+1}}">&raquo;</a>
+							</li>
+						</ul>
+					</nav>
+				</th:block>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

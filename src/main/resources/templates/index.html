@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="hero-panel">
+				<div class="row g-4 align-items-center">
+					<div class="col-lg-7">
+						<span class="eyebrow"><i class="fa-solid fa-leaf"></i> Daily fresh dairy essentials</span>
+						<h1 class="hero-title">Fresh milk, paneer, curd and kitchen staples delivered with care.</h1>
+						<p class="hero-copy">MilkBasket brings together premium dairy, reliable delivery and clean product management in one simple shopping experience for your customers and team.</p>
+						<div class="d-flex flex-wrap gap-3 mt-4">
+							<a href="/products" class="btn btn-primary btn-lg px-4">View Catalog</a>
+							<a href="/contact" class="btn btn-outline-brand btn-lg px-4">Talk to Us</a>
+						</div>
+						<div class="hero-stats">
+							<div class="hero-stat">
+								<strong>100% Fresh</strong>
+								<span>Cold-chain friendly dairy delivery</span>
+							</div>
+							<div class="hero-stat">
+								<strong>Fast Checkout</strong>
+								<span>COD and online payment support</span>
+							</div>
+							<div class="hero-stat">
+								<strong>Smart Stock</strong>
+								<span>Inventory updates automatically after orders</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-5">
+						<div class="hero-visual">
+							<img src="/img/MB-1.jpg" alt="Milk and dairy products">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-wrap">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Browse Categories</h2>
+						<p>Popular departments your customers can explore first.</p>
+					</div>
+					<a href="/products" class="btn btn-outline-brand">View catalog</a>
+				</div>
+				<div class="row g-4">
+					<div class="col-6 col-md-4 col-xl-2" th:each="c:${category}">
+						<a th:href="@{'/products?category='+${c.name}}" class="d-block h-100">
+							<div class="category-card p-4 text-center">
+								<img th:src="${@fileStorageService.resolveCategoryImage(c.imageName)}"
+									class="category-thumb" alt="Category image">
+								<h6 class="mb-1 text-dark">[[${c.name}]]</h6>
+								<span class="btn btn-outline-brand btn-sm mt-2">Explore</span>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="section-wrap">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">Latest Products</h2>
+						<p>Recently added items ready for quick purchase.</p>
+					</div>
+				</div>
+				<div class="row g-4">
+					<div class="col-md-6 col-xl-3" th:each="p:${products}">
+						<div class="product-card p-3">
+							<img th:src="${@fileStorageService.resolveProductImage(p.image)}"
+								class="product-thumb" alt="Product image">
+							<div class="p-2 pt-3">
+								<div class="d-flex justify-content-between align-items-start gap-2">
+									<h5 class="mb-2 text-dark">[[${p.title}]]</h5>
+									<span class="badge-soft" th:if="${p.stock > 0}">In stock</span>
+									<span class="badge-soft warning" th:unless="${p.stock > 0}">Sold out</span>
+								</div>
+								<p class="text-secondary small mb-3">[[${p.category}]]</p>
+								<div class="rating-row mb-3">
+									<div class="rating-stars">
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 1} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 2} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 3} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 4} ? 'filled' : ''"></i>
+										<i class="fa-solid fa-star" th:classappend="${p.averageRating != null and p.averageRating >= 5} ? 'filled' : ''"></i>
+									</div>
+									<span class="rating-value">[[${p.averageRating != null ? p.averageRating : 0.0}]]</span>
+									<span class="rating-meta">([[${p.ratingCount != null ? p.ratingCount : 0}]] reviews)</span>
+								</div>
+								<div class="price-block mb-3">
+									<span class="current"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.discountPrice)}]]</span>
+									<span class="original" th:if="${p.discount > 0}"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${@commnServiceImpl.formatPrice(p.price)}]]</span>
+									<span class="badge-soft" th:if="${p.discount > 0}">[[${p.discount}]]% off</span>
+								</div>
+								<a th:href="@{'/product/'+${p.id}}" class="btn btn-primary w-100">View Details</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

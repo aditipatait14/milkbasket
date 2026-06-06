@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<body>
+	<section>
+		<div class="container py-4">
+			<div class="surface-panel p-4">
+				<div class="section-head">
+					<div>
+						<h2 class="mb-1">My Orders</h2>
+						<p>Track every placed order and its current delivery status.</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.succMsg}">
+					<p class="alert alert-success text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<th:block th:if="${session.errorMsg}">
+					<p class="alert alert-danger text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<div class="table-responsive">
+					<table class="table align-middle">
+						<thead>
+							<tr>
+								<th>Order Id</th>
+								<th>Date</th>
+								<th>Product</th>
+								<th>Amount</th>
+								<th>Payment</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="o:${orders}">
+								<td>[[${o.orderId}]]</td>
+								<td>
+									<div>[[${o.orderDateTime != null ? #temporals.format(o.orderDateTime, 'dd MMM yyyy, hh:mm a') : o.orderDate}]]</div>
+									<div class="small text-secondary" th:if="${o.paymentRecordedAt != null}">
+										Paid: [[${#temporals.format(o.paymentRecordedAt, 'dd MMM yyyy, hh:mm a')}]]
+									</div>
+								</td>
+								<td>
+									<div class="fw-semibold">[[${o.product.title}]]</div>
+									<div class="small text-secondary">Qty: [[${o.quantity}]]</div>
+								</td>
+								<td>
+									<div><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${o.price}]]</div>
+									<div class="small text-secondary">Total: <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${o.quantity * o.price}]]</div>
+								</td>
+								<td>
+									<div>[[${o.paymentType}]]</div>
+									<div class="small text-secondary">[[${o.paymentStatus}]]</div>
+									<div class="small text-secondary" th:if="${o.paymentId!=null}">Ref: [[${o.paymentId}]]</div>
+								</td>
+								<td><span class="badge-soft">[[${o.status}]]</span></td>
+								<td>
+									<div class="d-flex flex-wrap gap-2">
+										<a th:href="@{'/product/'+${o.product.id}}" class="btn btn-sm btn-outline-brand">Review</a>
+										<a th:href="@{'/user/receipt/'+${o.id}}" class="btn btn-sm btn-primary">Receipt PDF</a>
+										<th:block th:if="${o.status!='Cancelled'}">
+											<a th:href="@{'/user/update-status?id='+${o.id}+'&st=6'}" class="btn btn-sm btn-danger">Cancel</a>
+										</th:block>
+										<th:block th:unless="${o.status!='Cancelled'}">
+											<a href="#" class="btn btn-sm btn-danger disabled">Cancelled</a>
+										</th:block>
+									</div>
+								</td>
+							</tr>
+							<tr th:if="${orders == null or #lists.isEmpty(orders)}">
+								<td colspan="7" class="text-center py-5">
+									<h5 class="mb-2">No orders yet</h5>
+									<p class="text-secondary mb-0">Once you place an order, it will appear here.</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>
