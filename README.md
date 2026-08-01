@@ -23,3 +23,4 @@ A full-stack web application for managing dairy products, orders, customers and 
 - MySQL
 - Thymeleaf
 - Bootstrap
+- Razorpay Payment Gateway
